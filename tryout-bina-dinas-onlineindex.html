@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TryOut SKD - Bina Dinas Academy</title>
+  <style>
+    :root{--bg:#f6f8fb;--card:#ffffff;--accent:#6b21a8;--muted:#6b7280}
+    *{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{margin:0;background:linear-gradient(180deg,#eef2ff 0%,var(--bg) 100%);color:#111}
+    .wrap{max-width:980px;margin:28px auto;padding:18px}
+    .card{background:var(--card);border-radius:12px;box-shadow:0 6px 22px rgba(16,24,40,0.06);padding:22px}
+    header{display:flex;align-items:center;gap:18px}
+    header img.logo{width:96px;height:96px;object-fit:contain;border-radius:8px}
+    header h1{margin:0;font-size:20px}
+    .center{display:flex;align-items:center;justify-content:center}
+    .login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+    input[type=text],input[type=password]{width:100%;padding:12px;border-radius:8px;border:1px solid #e6e9ef}
+    button{background:var(--accent);color:white;padding:10px 14px;border-radius:10px;border:0;cursor:pointer}
+    button.secondary{background:transparent;color:var(--accent);border:1px solid rgba(107,33,168,0.12)}
+    .meta{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+    .timer{font-weight:700;color:var(--accent)}
+    .questions{margin-top:18px}
+    .q{padding:14px;border-radius:10px;border:1px solid #eef2f6;margin-bottom:12px}
+    .q h4{margin:0 0 8px 0;font-size:15px}
+    .options label{display:block;padding:8px;border-radius:8px;margin-bottom:6px;border:1px solid transparent}
+    .options input{margin-right:9px}
+    .options label:hover{background:#fbfbfe}
+    .result{padding:18px;border-radius:10px;background:linear-gradient(90deg,#ecfccb,#bbf7d0);margin-top:16px}
+    .hidden{display:none}
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+    @media(max-width:700px){.login-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap card" id="app">
+    <header>
+      <img class="logo" src="https://iili.io/KXxUVPs.md.png" alt="Logo Bina Dinas Academy">
+      <div>
+        <h1>TryOut SKD CPNS / SEKDIN — Bina Dinas Academy</h1>
+        <div style="color:var(--muted);font-size:13px;margin-top:6px">Masuk dengan Nama Lengkap dan kata sandi khusus untuk memulai</div>
+      </div>
+    </header>
+
+    <!-- Login -->
+    <section id="loginSection" style="margin-top:18px">
+      <div class="login-grid">
+        <div>
+          <label>Nama Lengkap</label>
+          <input type="text" id="inputName" placeholder="Masukkan nama lengkap..." autocomplete="name">
+        </div>
+        <div>
+          <label>Sandi</label>
+          <input type="password" id="inputPass" placeholder="Masukkan sandi (contoh: BINADINAS)">
+        </div>
+      </div>
+      <div class="meta">
+        <div style="font-size:13px;color:var(--muted)">Sandi default: <strong>BINADINAS</strong></div>
+        <div>
+          <button id="btnStart">Mulai TryOut</button>
+        </div>
+      </div>
+      <div id="loginMessage" style="color:#b91c1c;margin-top:10px;font-size:14px;display:none"></div>
+    </section>
+
+    <!-- Quiz -->
+    <section id="quizSection" class="hidden">
+      <div class="meta">
+        <div>Peserta: <strong id="userName"></strong></div>
+        <div class="timer">Sisa waktu: <span id="timer">30:00</span></div>
+      </div>
+
+      <form id="quizForm" class="questions" onsubmit="return false">
+        <!-- Questions injected by JS -->
+      </form>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
+        <button type="button" class="secondary" id="btnAbort">Batal</button>
+        <button type="button" id="btnSubmit">Kumpulkan dan Selesai</button>
+      </div>
+
+      <div id="resultBox" class="hidden"></div>
+    </section>
+
+    <footer>
+      &copy; Bina Dinas Academy — TryOut SKD
+    </footer>
+  </div>
+
+<script>
+// Question data (from user)
+const QUESTIONS = [
+  {q: "Menumbuhkan jiwa patriotisme adalah wujud dari keinginan bangsa Indonesia dalam menumbuhkan rasa cinta kepada tanah air. Akan tetapi sejarah mencatat, patriotisme buta melahirkan nasionalisme yang sempit yang dikenal dengan paham...", opts: ["Liberalisme.","Kolonialisme.","Chauvinisme.","Primordialisme.","Ethnosentrisme"], a: 'C'},
+  {q: "Nasionalisme yang ada di Indonesia adalah Nasionalisme Pancasila. Berikut ini yang mencerminkan nasionalisme sesuai dengan nilai keadilan sosial adalah ...", opts:["Menegakkan hukum dengan adil tanpa diskriminasi sebagai kesamaan hak dan bentuk kewajiban sebagai warga negara.","Menumbuhkan sikap cinta tanah air dan rela berkorban bagi bangsa dan negara.","Menjaga kerukunan, toleransi, serta saling menghormati dalam keberagaman.","Menggunakan hak pilih dalam pemilu dengan jujur dan adil.","Menghindari sikap hidup yang hedonis."], a:'E'},
+  {q: "Semangat nasionalisme sangatlah berguna dalam memajukan perekonomian negara. Berikut ini yang merupakan cerminan perilaku yang bisa meningkatkan semangat nasionalisme sekaligus memajukan perkonomian negara adalah...", opts:["Membayar pajak tepat waktu dan sesuai dengan aturan.","Menggunakan produk dalam negeri karena produk luar negeri lebih mahal.","Menghindarkan diri dari korupsi, kolusi dan nepotisme.","Meningkatkan kapasitas diri agar menjadi SDM yang unggul.","Mengembangkan sektor usaha masyarakat menengah dan kurang mampu"], a:'A'},
+  {q: "Fenomena generasi muda yang mengalami kepudaran terhadap jiwa nasionalisme di era modern seperti saat ini disebabkan karena...", opts:["Orientasi nasionalisme adalah sikap dan perbuatan.","Labeling nasionalisme menjadi stigma bagi generasi muda","Ukuran nasionalisme dipahami hanya sebatas perjuangan secara fisik.","Kurangnya daya juang terhadap tantangan perubahan zaman.","Kurangnya sosok heroisme bagi kaum muda"], a:'D'},
+  {q: "Perhatikan sikap-sikap berikut ini: 1) Membebaskan setiap orang untuk memilih dan menjalankan agamanya; 2) Menggunakan Bahasa Indonesia dalam forum lintas daerah; 3) Menghargai kehidupan pribadi dan hak asasi setiap orang; 4) Mengembangkan sikap rela berkorban demi bangsa dan negara; 5) Mendahulukan kepentingan kelompok dan mengorbankan kepentingan pribadi; 6) Memberikan hak yang menjadi milik setiap individu. Sikap nasionalisme yang menciptakan suasana toleransi yang tumbuh dan berkembang dalam masyarakat multikultural Indonesia adalah ...", opts:["1, 2, 4","2, 4, 5","1, 3, 6","3, 4, 6","1, 4, 5"], a:'C'},
+  {q: "Tantangan terhadap keutuhan Negara Kesatuan Republik Indonesia (NKRI) seringkali muncul dari perbedaan pandangan politik yang ekstrim di antara masyarakat. Perbedaan pandangan ini, jika tidak dikelola dengan baik, dapat memicu ketegangan dan konflik yang lebih besar di dalam masyarakat. Bagaimana sebaiknya pemerintah mengelola tantangan ini untuk menjaga nasionalisme masyarakat dan mencegah konflik...", opts:["Dengan melarang seluruh kegiatan politik di media sosial.","Dengan memfasilitasi serta mendorong dialog terbuka antara kelompok-kelompok politik yang berbeda.","Dengan membuat kebijakan yang tegas bagi kelompok politik di masyarakat.","Dengan membubarkan kelompok politik yang memiliki pandangan ekstrim.","Dengan menggerakkan TNI/Polri untuk melakukan Tindakan tegas bagi kelompok politik yang berkonflik."], a:'B'},
+  {q: "Korupsi terjadi ketika tidak ada nilai-nilai antikorupsi yang kuat ditanamkan dalam diri. Melalui pembiasaan dan pengembangan nilai-nilai antikorupsi diharapkan memiliki kendali diri terhadap pengaruh buruk lingkungan, salah satunya melalui aspek integritas etos kerja yang terdiri dari ...", opts:["Adil, berani, peduli.","Kerja keras, mandiri, sederhana","Disiplin, tanggung jawab dan kerja keras.","Komitmen, Konsisten dan Transparan.","Kerja keras, mandiri dan tanggungjawab."], a:'B'},
+  {q: "Berikut ini yang termasuk permasalahan integritas internal yang sering ditemui di lingkungan kerja pegawai birokrasi adalah ...", opts:["Pemerasan pegawai yang meminta uang di luar ketentuan saat mengakses layanan.","Memberikan hadiah kepada petugas untuk mempermudah pelayanan.","Tidak adanya pendidikan dan pelatihan budaya antikorupsi yang secara rutin diberikan kepada pegawai.","Menerima pegawai dan promosi jabatan berdasarkan hubungan kekeluargaan.","Belum adanya sistem pengaduan Masyarakat terhadap KKN yang mudah diakses dan transparan."], a:'D'},
+  {q: "KH. Wahid Hasyim adalah salah satu tokoh nasional yang berintegritas. Beliau adalah salah satu pendiri Nahdatul Ulama meskipun mengalami berbagai kendala dan hambatan. Sikap integritas yang bisa diteladani dari KH Wahid Hasyim adalah...", opts:["Tanggungjawab dan kejujuran sebagai seorang tokoh nasional yang berpengaruh.","Sosok yang bijaksana dan adil yang berhasil mendirikan Nahdatul Ulama.","Semangat kerja keras dan pantang menyerah dalam mendirikan Nahdatul Ulama.","Kepedulian tinggi terhadap kemajuan bangsa dan negara dengan mendirikan Nahdatul ulama.","Kecerdasan dan kehati-hatian dalam mengambil setiap keputusan."], a:'C'},
+  {q: "Untuk membentuk karakter penyelenggara negara yang memiliki sikap kritis, rasional, dan berintegritas tinggi maka dalam hal ini diperlukan adanya...", opts:["Sumpah setia jabatan.","Diklat prajabatan.","Peraturan perundang-undangan yang mengatur hal tersebut.","Seminar kepegawaian.","Kode etik dan kode Perilaku"], a:'E'},
+  {q: "Orang yang berintegritas, senantiasa patuh terhadap norma-norma yang berlaku. Norma yang bersumber pada hati nurani manusia disebut dengan...", opts:["Norma adat.","Norma agama.","Norma kesopanan.","Norma kesusilaan.","Norma hukum"], a:'D'},
+  {q: "Untuk melakukan upaya bela negara, perlu adanya motivasi yang tinggi sehingga setiap warga negara memahami kelemahan dan kelebihan bangsa Indonesia. Berikut ini yang bukan merupakan faktor yang mempengaruhi motivasi bela negara di Indonesia adalah...", opts:["Sikap cinta tanah air dan rela berkorban demi bangsa dan negara.","Adanya kemungkinan ancaman baik militer maupun nonmiliter terhadap kelangsungan bangsa dan negara.","Letak geografis Indonesia yang sangat strategis.","Adanya pengalaman sejarah kehidupan bangsa Indonesia.","Kemajuan ilmu pengetahuan dan teknologi"], a:'A'},
+  {q: "Perhatikan pernyataan berikut ini: 1) Memiliki kemampuan, integritas dan kepercayaan diri yang tinggi. 2) Mendahulukan kepentingan Bangsa dan Negara dari pada kepentingan pribadi dan golongan. 3) Rela menolong sesama warga masyarakat yang mengalami kesulitan. 4) Senantiasa menjaga kesehatannya sehingga memiliki kesehatan fisik dan mental yang baik. 5) Memiliki Kecerdasan Emosional dan spiritual serta Intelegensi yang tinggi. Indikator kemampuan awal bela negara ditunjukkan oleh nomor...", opts:["1, 2, 3","1, 4, 5","3, 4, 5","2, 3, 4","2, 3, 5"], a:'B'},
+  {q: "Cinta terhadap bangsa merupakan salah satu upaya dalam pembelaan negara. Berikut ini contoh perwujudan cinta terhadap bangsa sebagai upaya bela negara adalah ...", opts:["Meyakini bahwa bangsa Indonesia adalah bangsa yang paling baik diantara bangsa lain.","Membantu korban bencana alam di daerah-daerah terpencil.","Membeli produk dalam negeri karena harganya yang lebih murah.","Mendukung dan menghargai karya anak bangsa.","Melakukan imitasi terhadap segala bentuk perubahan dari bangsa lain"], a:'D'},
+  {q: "Pasal 27 Ayat 1 mengamanatkan bahwa segala warga negara bersamaan kedudukannya di dalam hukum dan pemerintahan serta wajib menjunjung hukum dan pemerintahan itu dengan tidak ada kecualinya. Berikut yang bukan merupakan upaya bela negara sesuai pasal tersebut adalah ...", opts:["Mematuhi arahan kepala desa terkait kesadaran menjaga lingkungan.","Memahami dan menaati peraturan lalu lintas.","Setia dan taat kepada Pancasila.","Taat membayar pajak.","Menjaga keamanan dan ketertiban lingkungan sekitar melalui kegiatan pos kamling"], a:'E'},
+  {q: "Kemampuan awal bela negara oleh seorang pedagang dapat ditunjukkan dalam sikap...", opts:["Sebagai seorang pedagang, Bu Alisa sering memberikan gratisan kepada anak Yatim.","Meski dagangannya tidak laku, Pak Adit tetap melakukan inovasi.","Bu Dara menjual makanan khas Indonesia di luar negeri.","Bu Gita membantu pedagang lain untuk membuka usaha dagangan yang bangkrut.","Ririn membayar pajak penghasilan dari usaha dagangnya"], a:'B'},
+  {q: "Pancasila menjadi landasan dalam pembentukan Undang-Undang. Salah satunya adalah bahwa pembentukan Undang-Undang harus memperhatikan aspek spiritualitas. Bukti bahwa nilai ketuhanan dijadikan dasar dalam pembentukan Undang-Undang adalah...", opts:["Penyusunan undang-undang dengan melibatkan tokoh-tokoh agama.","Pencantuman sila pertama dalam pembukaan setiap undang-undang.","Adanya undang-undang yang mengatur kebebasan beragama dan beribadah.","Penetapan hari-hari besar agama sebagai hari libur nasional.","Pembentukan undang-undang yang melindungi hak-hak minoritas agama"], a:'C'},
+  {q: "Perhatikan pernyataan berikut ini: 1) Memilih hidup sederhana meski memiliki kemampuan secara materi. 2) Mematuhi peraturan lalu lintas. 3) Hidup rukun dalam kebersamaan dan solidaritas sosial. 4) Membayar pajak tepat waktu. Berikut ini yang bukan merupakan contoh pengamalan Pancasila sebagai pandangan hidup bangsa ditujukan oleh nomor...", opts:["1, 2","1, 3","1, 4","2, 3","2, 4"], a:'E'},
+  {q: "Pengamalan terhadap nilai-nilai Pancasila dengan cara mematuhi peraturan perundangan yang berlaku, misalnya menggunakan helm saat mengendarai sepeda motor adalah wujud pengamalan nilai Pancasila secara...", opts:["Objektif","Subjektif","Praksis","Realistis","Instrumental"], a:'C'},
+  {q: "Dalam UUD 1945, disebutkan bahwa Mahkamah Agung berwenang untuk memberikan pertimbangan kepada presiden dalam hal grasi dan abolisi. Namun, keputusan akhir tetap berada di tangan presiden. Kenapa Presiden perlu pertimbangan MA dalam memberikan grasi..", opts:["Mahkamah Agung hanya berfungsi sebagai penasihat tanpa kewenangan mengikat dalam keputusan hukum presiden.","Presiden memiliki otoritas mutlak dalam pemberian grasi, amnesti, abolisi, dan rehabilitasi.","Pertimbangan Mahkamah Agung bersifat fakultatif dan tidak selalu diikuti oleh presiden.","Mahkamah Agung memiliki peran penting dalam mempengaruhi keputusan akhir presiden, meskipun tidak mengikat.","Keputusan hukum tertinggi di Negara ini tetap berada di tangan eksekutif meskipun ada pengaruh dari yudikatif."], a:'D'},
+  {q: "Contoh sikap yang bisa dilakukan sebagai pengamalan pokok pikiran keempat pembukaan UUD 1945 antara lain...", opts:["Tidak memaksakan kehendak dan pendapat kepada orang lain.","Tidak rasis serta membanding-bandingkan sesuatu.","Menanamkan sikap dan nilai toleransi.","Menanamkan sikap menghargai pendapat orang lain.","Menjaga serta merawat makhluk dan semua ciptaan Tuhan."], a:'E'},
+  {q: "Berikut ini yang merupakan ancaman dalam hal lunturnya nilai luhur bangsa Indonesia yang bisa berdampak terhadap melemahnya persatuan dan kesatuan adalah ...", opts:["Menurunnya etos kerja Masyarakat sehingga banyak kemiskinan.","Melemahnya kejujuran yang berakibat kepada menurunnya kepercayaan antar masyarakat.","Ketidakmerataan Pembangunan infrastruktur di tengah masyarakat.","Kebijakan pemerintah yang tidak berpihak kepada Masyarakat menengah kebawah.","Masyarakat yang cenderung anti teknologi sehingga sulit untuk berkembang."], a:'B'},
+  {q: "Memaknai Bhinneka Tunggal Ika di tengah masyarakat yang majemuk di Indonesia sangatlah penting. Berikut ini sikap yang paling mencerminkan Bhineka Tunggal Ika oleh masyarakat adalah...", opts:["Bersatu dan bekerja sama.","Menerima, menghormati dan menghargai perbedaan.","Mendahulukan kepentingan bersama di atas kepentingan pribadi.","Saling mengasihi dan menyayangi.","Mau menerima kelompok lain jika menguntungkan"], a:'B'},
+  {q: "Sebagai warga Negara sudah sepatutnya kita wajib mendukung penyelenggaraan Negara berorientasi kepada kepentingan rakyat dan merupakan perwujudan nilai-nilai Pancasila sebagai ideologi terbuka. Bersikap positif terhadap Pancasila sebagai ideologi terbuka adalah, kecuali...", opts:["Bersikap terbuka terhadap perubahan yang berdampak pada kemakmuran bangsa.","Menyaring budaya-budaya asing yang masuk baik secara langsung maupun tidak langsung.","Mengembangkan prinsip toleransi, bekerjasama dan kekeluargaan dalam setiap perikehidupan.","Mengembangkan kehidupan demokrasi yang disesuaikan dengan kebutuhan bangsa dewasa ini.","Menyerap semua nilai-nilai yang masuk demi kemajuan bangsa pada era globalisasi sekarang ini."], a:'E'},
+  {q: "Bentuk tubuh hewan mengikuti habitatnya. Salah satu bentuk tubuh yang banyak dimiliki oleh hewan air adalah bentuk rudal. Bentuk tubuh ini memungkinkan ikan meliuk ke kiri dan ke kanan. Bentuk tubuh yang seperti ini juga berfungsi untuk mengurangi hambatan pada saat bergerak dalam air. Ekor dan sirip ekor yang lebar berfungsi untuk mendorong gerakan ikan di dalam air. Kalimat utama pada paragraf tersebut adalah...", opts:["Bentuk tubuh hewan mengikuti habitatnya.","Salah satu bentuk tubuh yang banyak dimiliki oleh hewan air adalah bentuk rudal.","Bentuk tubuh ini memungkinkan ikan meliuk ke kiri dan ke kanan.","Bentuk tubuh yang seperti ini juga berfungsi untuk mengurangi hambatan pada saat bergerak dalam air.","Ekor dan sirip ekor yang lebar berfungsi untuk mendorong gerakan ikan di dalam air"], a:'B'},
+  {q: "Putri Ariani berhasil membuat bangga masyarakat Indonesia setelah berhasil masuk ke ajang pencarian bakat internasional America's Got Talent. Perjuangan Putri tidak mudah dan tidak lepas dari peran orangtua. Orangtua Putri Ariani harus merelakan waktu mereka, perhatian mereka lebih banyak dicurahkan kepada Putri. Ayah Putri Ariani sampai harus rela keluar dari kerja. Tidak mudah menjadi orang tua dari anak berkebutuhan khusus. Ibunda Putri Ariani harus memilih anak atau karier, tetapi ia lebih memilih anak ketimbang kariernya. Perjuangan orangtua Putri pada akhirnya membuahkan hasil. Putri mampu menjadi seorang anak yang mampu membuat bangga orangtua serta masyarakat Indonesia. Peran keduanya yang tidak mengenal lelah dan penuh kesabaran menjadi kunci sukses Putri Ariani. Pokok pikiran wacana di atas adalah...", opts:["Perjuangan Putri Ariani membanggakan orang tuanya.","Peran orang tua dalam kesuksesan Putri Ariani.","Kesuksesan Putri Ariani membanggakan orang tua.","Putri Ariani membuat bangga masyarakat Indonesia.","Kisah sukses orang tua dalam mendidik anak."], a:'B'},
+  {q: "Tiga hari yang lalu penjahit itu menyampaikan bahwa bajunya telah selesai. Anak kalimat pada kalimat di atas berfungsi sebagai ....", opts:["Subyek","Predikat","Obyek","Keterangan","Pelengkap"], a:'C'},
+  {q: "Perhatikan kalimat berikut! Di suatu perlombaan bulu tangkis, Ginting terlihat kesulitan dalam menghadapi lawannya. Dia telah kalah pada set pertama dengan skor 19-21. Set kedua juga ternyata Ginting kalah dengan skor tipis 23-25. Akhirnya, Ginting mengakui kekalahannya dan menyalami lawannya tersebut. Paragraf tersebut mengandung nilai...", opts:["Sosial","Budaya","Moral","Agama","Pendidikan"], a:'C'},
+  {q: "Penggunaan kata baku yang tepat ditunjukkan oleh kalimat...", opts:["Susu itu sudah kadaluarsa.","Makanan itu sudah kedaluarsa.","Roti itu sudah kadaluwarsa.","Susu itu sudah kedaluwarsa.","Roti itu sudah kadaluarsah"], a:'C'},
+  {q: "Kalimat di bawah ini yang mengandung kata tidak baku adalah...", opts:["Ani pergi ke apotik untuk membeli obat.","Budi adalah seorang mantan atlet.","Candra melakukan ekspor barang dengan temannya.","Delon memberikan nasihat pada teman-temannya.","Elon pergi ke bank bersama ayahnya"], a:'A'}
+];
+
+const MAX_TIME = 30*60; // seconds
+let timerInterval = null;
+let timeLeft = MAX_TIME;
+let loggedIn = false;
+
+function renderQuestions(){
+  const form = document.getElementById('quizForm');
+  form.innerHTML = '';
+  QUESTIONS.forEach((item, idx)=>{
+    const num = idx+1;
+    const div = document.createElement('div'); div.className='q';
+    const h = document.createElement('h4'); h.innerText = `${num}. ${item.q}`;
+    div.appendChild(h);
+    const opts = document.createElement('div'); opts.className='options';
+    ['A','B','C','D','E'].forEach((label,i)=>{
+      const id = `q${idx}_opt_${label}`;
+      const lab = document.createElement('label');
+      lab.htmlFor = id;
+      const radio = document.createElement('input');
+      radio.type='radio'; radio.name=`q${idx}`; radio.id=id; radio.value=label;
+      lab.appendChild(radio);
+      const span = document.createElement('span'); span.innerText = ` ${label}. ` + item.opts[i];
+      lab.appendChild(span);
+      opts.appendChild(lab);
+    });
+    div.appendChild(opts);
+    form.appendChild(div);
+  });
+}
+
+function startTimer(){
+  updateTimerDisplay();
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    if(timeLeft<=0){
+      clearInterval(timerInterval);
+      timeLeft = 0;
+      autoSubmit();
+    }
+    updateTimerDisplay();
+  },1000);
+}
+function updateTimerDisplay(){
+  const el = document.getElementById('timer');
+  const mm = String(Math.floor(timeLeft/60)).padStart(2,'0');
+  const ss = String(timeLeft%60).padStart(2,'0');
+  el.innerText = `${mm}:${ss}`;
+}
+
+function autoSubmit(){
+  document.getElementById('btnSubmit').disabled = true;
+  computeResult(true);
+}
+
+function computeResult(auto=false){
+  const form = document.getElementById('quizForm');
+  let correct=0; let answered=0;
+  QUESTIONS.forEach((it,idx)=>{
+    const sel = form[`q${idx}`];
+    if(!sel) return;
+    const value = Array.from(document.getElementsByName(`q${idx}`)).find(r=>r.checked);
+    if(value){ answered++; if(value.value===it.a) correct++; }
+  });
+  const score = correct*5;
+  showResult({correct,answered,score,auto});
+}
+
+function showResult({correct,answered,score,auto}){
+  clearInterval(timerInterval);
+  const box = document.getElementById('resultBox');
+  box.classList.remove('hidden');
+  box.className = 'result';
+  box.innerHTML = `<h3>Selamat, ${document.getElementById('userName').innerText}!</h3>
+    <p>Anda telah menyelesaikan TryOut SKD.</p>
+    <p><strong>Skor:</strong> ${score} (Benar: ${correct}, Salah/Tidak dijawab: ${QUESTIONS.length-correct})</p>
+    <p>Waktu tersisa: ${document.getElementById('timer').innerText}</p>`;
+  // show detailed feedback
+  const details = document.createElement('div'); details.style.marginTop='12px';
+  QUESTIONS.forEach((it,idx)=>{
+    const userSel = Array.from(document.getElementsByName(`q${idx}`)).find(r=>r.checked);
+    const userAns = userSel?userSel.value:'-';
+    const ok = userAns===it.a;
+    const p = document.createElement('div'); p.style.padding='8px 0';
+    p.innerHTML = `<strong>${idx+1}.</strong> Jawaban Anda: ${userAns} ${ok?'<span style="color:green">(Benar)</span>':'<span style="color:#b91c1c">(Salah)</span>'} — Kunci: ${it.a}`;
+    details.appendChild(p);
+  });
+  box.appendChild(details);
+  // final congratulations message
+  const congrats = document.createElement('div'); congrats.style.marginTop='14px';
+  congrats.innerHTML = `<div style="font-weight:700">🎉 Selamat! Kamu telah menyelesaikan TryOut SKD Bina Dinas Academy.</div>`;
+  box.appendChild(congrats);
+  // disable inputs
+  Array.from(document.querySelectorAll('input')).forEach(i=>i.disabled=true);
+}
+
+// Event handlers
+document.getElementById('btnStart').addEventListener('click',()=>{
+  const name = document.getElementById('inputName').value.trim();
+  const pass = document.getElementById('inputPass').value.trim();
+  const msg = document.getElementById('loginMessage');
+  if(!name){ msg.style.display='block'; msg.innerText='Nama lengkap harus diisi.'; return; }
+  if(pass.toUpperCase() !== 'BINADINAS'){ msg.style.display='block'; msg.innerText='Sandi salah. Gunakan kata sandi BINADINAS.'; return; }
+  msg.style.display='none';
+  // proceed to quiz
+  loggedIn = true; document.getElementById('userName').innerText = name;
+  document.getElementById('loginSection').classList.add('hidden');
+  document.getElementById('quizSection').classList.remove('hidden');
+  renderQuestions(); startTimer();
+});
+
+document.getElementById('btnAbort').addEventListener('click',()=>{
+  if(!confirm('Batalkan TryOut? Semua jawaban saat ini akan hilang.')) return;
+  location.reload();
+});
+
+document.getElementById('btnSubmit').addEventListener('click',()=>{
+  if(!confirm('Kirim jawaban dan akhiri TryOut sekarang?')) return;
+  computeResult(false);
+});
+
+// safety: warn user if try to close tab
+window.addEventListener('beforeunload',(e)=>{
+  if(loggedIn){ e.preventDefault(); e.returnValue='Anda sedang mengerjakan TryOut. Apakah yakin ingin meninggalkan halaman?'; }
+});
+</script>
+</body>
+</html>
